@@ -11,13 +11,19 @@ import mechanize
 
 USER_AGENT = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36'}
 # SEARCH_URL = "https://www.duckduckgo.com/html/?q="
-SEARCH_URL = "https://www.redfin.com/county/321/CA/Los-Angeles-County"
+SEARCH_URL = "https://www.redfin.com/county/321/CA/Los-Angeles-County/filter/property-type=house+condo+townhouse+multifamily,min-price=375k,max-price=550k"
 
 class Analyzer:
     def __init__(self):
         print("starting class")
         self.card_links = set()
 
+    def page_extract(self):
+        c = 1
+        for link in self.card_links: 
+            print(c, "   ",link)
+            c+=1
+        
 
     def search(self, sleep=False):
         if sleep: # Prevents loading too many pages too soon
@@ -30,22 +36,22 @@ class Analyzer:
         soup = BeautifulSoup(page.text,"html.parser")
         page = self.scrape_page_number(soup)
         print("page text  -  ", page)
+          
+        for p in range(2):
+            # print(p)
+            add_url = "/page-" + str(p+1)
+            soup = self.get_soup(add_url)
+            res = set(self.scrape_search_result(soup))
+            print(len(res))
+            self.card_links.update(res)
         
-        for p in range(page):
-            print(p)
-            add_url = url + "/page-" + str(p)
-            print(add_url)
-            # soup = self.get_soup(add_url)
-            # res = set(self.scrape_search_result(soup))
-            # self.card_links.append(res)
-
         return
 
     def get_soup(self, add_url):
         try:
-            print("success")
+            # print("success")
             url = SEARCH_URL + str(add_url)
-            print(url)
+            # print(url)
             page = requests.get(url, headers=USER_AGENT)
             soup = BeautifulSoup(page.text,"html.parser")
             return soup
@@ -88,4 +94,4 @@ if __name__ == '__main__':
     print("hello world")
     a = Analyzer()
 
-    a.search(False)
+    a.search(True)
